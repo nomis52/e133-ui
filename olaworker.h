@@ -25,9 +25,12 @@ class OLAWorker : public QObject {
     void GetServerInfo();
 
     void DiscoveryCallback(bool status, const URLEntries &urls);
+    void newSLPServerInfo(bool ok, const ola::e133::SLPThreadServerInfo &server_info);
 
   signals:
     void newSLPDevices(const URLEntries &urls);
+    void SLPServerProperties(bool da_enabled, uint16_t port, const QString &scopes,
+                             const QString &backend_type);
     void finished();
 
   public slots:

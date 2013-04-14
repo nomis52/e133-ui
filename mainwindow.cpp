@@ -2,7 +2,7 @@
 #include <QThread>
 #include <ola/e133/E133URLParser.h>
 #include <ola/e133/SLPThread.h>
-#include <ola/network/IPV4Address.h>>
+#include <ola/network/IPV4Address.h>
 #include <ola/rdm/UID.h>
 
 #include "mainwindow.h"
@@ -38,10 +38,20 @@ MainWindow::MainWindow(OLAWorker *worker, QWidget *parent)
   ui->tableView->setModel(device_model_);
   ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
-  // ui->   ->setText(ToQString(worker->DiscoveryInterval()));
+  QString refresh_str = ToQString(worker->DiscoveryInterval());
+  refresh_str.append(" seconds");
+  ui->SLPRefreshLabel->setText(refresh_str);
   QObject::connect(worker_, SIGNAL(newSLPDevices(const URLEntries&)),
                    this, SLOT(updateDeviceTable(const URLEntries&)),
                    Qt::BlockingQueuedConnection);
+  QObject::connect(worker_,
+                   SIGNAL(SLPServerProperties(bool, uint16_t, const QString&,
+                                              const QString&)),
+                   this,
+                   SLOT(updateSLPServerInfo(bool, uint16_t, const QString&,
+                                            const QString&)),
+                   Qt::BlockingQueuedConnection);
+  worker_->GetServerInfo();
 }
 
 MainWindow::~MainWindow() {
@@ -50,7 +60,6 @@ MainWindow::~MainWindow() {
 
 void MainWindow::on_pushButton_clicked()
 {
-  qDebug() << "button was pressed";
   SetStatusMessage(DISCOVERY_MESSAGE);
   worker_->RunSLPDiscoveryNow();
 }
@@ -58,7 +67,6 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::updateDeviceTable(const URLEntries &urls) {
   SetStatusMessage("");
 
-  qDebug() << "in updateDeviceTable in " << QThread::currentThreadId();
   int i = 0;
 
   for (const auto& url : urls) {
@@ -77,6 +85,15 @@ void MainWindow::updateDeviceTable(const URLEntries &urls) {
     qDebug() << url.url().c_str();
     i++;
   }
+}
+
+void MainWindow::updateSLPServerInfo(bool da_enabled, uint16_t port,
+                                     const QString &scopes,
+                                     const QString &backend_type) {
+  ui->SLPDAEnabledLabel->setText(da_enabled ? "Enabled" : "Disabled");
+  ui->SLPPortLabel->setText(ToQString(port));
+  ui->SLPScopesLabel->setText(scopes);
+  ui->SLPBackendType->setText(backend_type);
 }
 
 void MainWindow::SetStatusMessage(const QString &message) {

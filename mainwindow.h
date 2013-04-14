@@ -28,6 +28,8 @@ signals:
 
 public slots:
     void updateDeviceTable(const URLEntries &urls);
+    void updateSLPServerInfo(bool da_enabled, uint16_t port, const QString &scopes,
+                             const QString &backend_type);
 
 private slots:
     void on_pushButton_clicked();
