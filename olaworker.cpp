@@ -1,28 +1,49 @@
 #include <QDebug>
 #include <ola/StringUtils.h>
+#include <ola/e133/E133URLParser.h>
 #include "olaworker.h"
+
+using ola::NewCallback;
 
 OLAWorker::OLAWorker(unsigned int  slp_discovery_interval,
                      QObject *parent)
     : QObject(parent),
-       slp_discovery_interval_( slp_discovery_interval) {
+      m_slp_discovery_interval(slp_discovery_interval),
+      m_cid(ola::acn::CID::Generate()),
+      m_message_builder(m_cid, "OLA Controller"),
+      m_device_manager(&m_ss, &m_message_builder),
+      m_slp_thread(&m_ss) {
+  m_device_manager.SetAcquireDeviceCallback(
+      NewCallback(this, &OLAWorker::DeviceConnect));
+  m_device_manager.SetReleaseDeviceCallback(
+      NewCallback(this, &OLAWorker::DeviceDisconnect));
+  m_device_manager.SetRDMMessageCallback(
+      NewCallback(this, &OLAWorker::DeviceMessage));
 }
 
 OLAWorker::~OLAWorker() {
 }
 
 void OLAWorker::RunSLPDiscoveryNow() {
-  slp_thread_->RunDeviceDiscoveryNow();
+  m_slp_thread.RunDeviceDiscoveryNow();
 }
 
-
 void OLAWorker::GetServerInfo() {
-  slp_thread_->ServerInfo(
+  m_slp_thread.ServerInfo(
     ola::NewSingleCallback(this, &OLAWorker::newSLPServerInfo));
 }
 
 void OLAWorker::DiscoveryCallback(bool status, const URLEntries &urls) {
   if (status) {
+    for (const auto& url : urls) {
+      ola::rdm::UID uid(0, 0);
+      ola::network::IPV4Address ip;
+      if (!ola::e133::ParseE133URL(url.url(), &uid, &ip)) {
+        qWarning() << "Invalid E1.33 URL: " << url.url().c_str();
+        continue;
+      }
+      m_device_manager.AddDevice(ip);
+    }
     emit newSLPDevices(urls);
   } else {
     qWarning() << "SLP Discovery Failed";
@@ -40,21 +61,31 @@ void OLAWorker::newSLPServerInfo(bool ok,
   }
 }
 
-void OLAWorker::process() {
-  ss_.reset(new ola::io::SelectServer());
-  slp_thread_.reset(new ola::e133::OLASLPThread(ss_.get()));
+void OLAWorker::DeviceConnect(const IPV4Address &ip) {
+  emit TCPConnect(ip);
+}
 
-  slp_thread_->SetNewDeviceCallback(
+void OLAWorker::DeviceDisconnect(const IPV4Address &ip) {
+  emit TCPDisconnect(ip);
+}
+
+bool OLAWorker::DeviceMessage(const IPV4Address &device, uint16_t endpoint,
+                              const string &message) {
+  emit TCPMessage(device, endpoint, message);
+  return true;  // ack
+}
+
+void OLAWorker::process() {
+  m_slp_thread.SetNewDeviceCallback(
       ola::NewCallback(this, &OLAWorker::DiscoveryCallback));
-  if (!slp_thread_->Init()) {
+  if (!m_slp_thread.Init()) {
     qWarning() << "Failed to start slp thread";
     return;
   }
-  slp_thread_->Start();
-
-  ss_->Run();
-  slp_thread_->Join(NULL);
-  slp_thread_->Cleanup();
+  m_slp_thread.Start();
+  m_ss.Run();
+  m_slp_thread.Join(NULL);
+  m_slp_thread.Cleanup();
 
   emit finished();
 }

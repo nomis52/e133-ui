@@ -18,8 +18,8 @@ int main(int argc, char *argv[]) {
   QObject::connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
   QObject::connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 
-  thread->start();
   MainWindow w(worker);
+  thread->start();
   w.show();
     
   return a.exec();
