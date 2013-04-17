@@ -14,9 +14,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    olaworker.cpp
+    olaworker.cpp \
+    devicetracker.cpp \
+    e133devicetablemodel.cpp \
+    e133devicelistmodel.cpp
 
 HEADERS  += mainwindow.h \
-    olaworker.h
+    olaworker.h \
+    devicetracker.h \
+    e133devicetablemodel.h \
+    e133devicelistmodel.h
 
 FORMS    += mainwindow.ui

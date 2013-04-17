@@ -1,9 +1,9 @@
-#include "mainwindow.h"
-#include "olaworker.h"
+#include <ola/Logging.h>
 #include <QApplication>
 #include <QDebug>
 #include <QThread>
-#include <ola/Logging.h>
+#include "mainwindow.h"
+#include "olaworker.h"
 
 static const unsigned int DEFAULT_SLP_DISCOVERY_INTERVAL = 60;
 
@@ -21,6 +21,6 @@ int main(int argc, char *argv[]) {
   MainWindow w(worker);
   thread->start();
   w.show();
-    
+
   return a.exec();
 }

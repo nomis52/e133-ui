@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="SLPTab">
        <attribute name="title">
@@ -157,13 +157,6 @@
             </layout>
            </item>
           </layout>
-          <zorder>layoutWidget</zorder>
-          <zorder>label_5</zorder>
-          <zorder>label_9</zorder>
-          <zorder>label_3</zorder>
-          <zorder>label_6</zorder>
-          <zorder>SLPDAEnabledLabel</zorder>
-          <zorder>SLPPortLabel</zorder>
          </widget>
         </item>
         <item>
@@ -276,7 +269,14 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox"/>
+           <widget class="QComboBox" name="ipComboBox">
+            <property name="editable">
+             <bool>false</bool>
+            </property>
+            <property name="currentIndex">
+             <number>-1</number>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_8">
@@ -345,7 +345,7 @@
             </item>
             <item>
              <property name="text">
-              <string>SEt</string>
+              <string>SET</string>
              </property>
             </item>
            </widget>

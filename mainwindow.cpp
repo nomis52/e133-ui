@@ -1,12 +1,11 @@
-#include <QDebug>
-#include <QThread>
-#include <sstream>
 #include <ola/StringUtils.h>
-#include <ola/e133/E133URLParser.h>
 #include <ola/e133/SLPThread.h>
 #include <ola/network/IPV4Address.h>
 #include <ola/rdm/RDMCommand.h>
-#include <ola/rdm/UID.h>
+#include <QDebug>
+#include <QThread>
+#include <sstream>
+#include <string>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -28,7 +27,9 @@ MainWindow::MainWindow(OLAWorker *worker, QWidget *parent)
     : QMainWindow(parent),
       worker_(worker),
       ui(new Ui::MainWindow),
-      device_model_(new QStandardItemModel(0, 3, this)),
+      m_device_tracker(),
+      m_model_table(&m_device_tracker),
+      m_model_list(&m_device_tracker),
       m_pid_helper("/usr/local/share/ola/pids", 4),  // hack alert!
       m_command_printer(&m_command_str, &m_pid_helper) {
   ui->setupUi(this);
@@ -38,17 +39,10 @@ MainWindow::MainWindow(OLAWorker *worker, QWidget *parent)
     qWarning() << "Failed to init PID helper";
   }
 
-  device_model_->setHorizontalHeaderItem(
-      0, new QStandardItem(QString("IP Address")));
-  device_model_->setHorizontalHeaderItem(
-      1, new QStandardItem(QString("E1.33 UID")));
-  device_model_->setHorizontalHeaderItem(
-      2, new QStandardItem(QString("SLP Lifetime")));
-  device_model_->setHorizontalHeaderItem(
-      3, new QStandardItem(QString("Designated Controller")));
-
-  ui->tableView->setModel(device_model_);
+  ui->tableView->setModel(&m_model_table);
   ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+  ui->tableView->verticalHeader()->hide();
+  ui->ipComboBox->setModel(&m_model_list);
 
   QString refresh_str = ToQString(worker->DiscoveryInterval());
   refresh_str.append(" seconds");
@@ -73,11 +67,12 @@ MainWindow::MainWindow(OLAWorker *worker, QWidget *parent)
                    this,
                    SLOT(logTCPDisconnect(const IPV4Address&)),
                    Qt::BlockingQueuedConnection);
-  QObject::connect(worker_,
-                   SIGNAL(TCPMessage(const IPV4Address&, uint16_t, const string&)),
-                   this,
-                   SLOT(logTCPMessage(const IPV4Address&, uint16_t, const string&)),
-                   Qt::BlockingQueuedConnection);
+  QObject::connect(
+        worker_,
+        SIGNAL(TCPMessage(const IPV4Address&, uint16_t, const string&)),
+        this,
+        SLOT(logTCPMessage(const IPV4Address&, uint16_t, const string&)),
+        Qt::BlockingQueuedConnection);
 
   worker_->GetServerInfo();
 }
@@ -86,33 +81,14 @@ MainWindow::~MainWindow() {
   delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
-{
+void MainWindow::on_pushButton_clicked() {
   SetStatusMessage(DISCOVERY_MESSAGE);
   worker_->RunSLPDiscoveryNow();
 }
 
 void MainWindow::updateDeviceTable(const URLEntries &urls) {
   SetStatusMessage("");
-
-  int i = 0;
-
-  for (const auto& url : urls) {
-    ola::rdm::UID uid(0, 0);
-    ola::network::IPV4Address ip;
-    if (!ola::e133::ParseE133URL(url.url(), &uid, &ip)) {
-      qWarning() << "Invalid E1.33 URL: " << url.url().c_str();
-      continue;
-    }
-    QString lifetime = ToQString(url.lifetime());
-    device_model_->setItem(
-          i, 0, new QStandardItem(QString(ip.ToString().c_str())));
-    device_model_->setItem(
-          i, 1, new QStandardItem(QString(uid.ToString().c_str())));
-    device_model_->setItem(i, 2, new QStandardItem(lifetime));
-    qDebug() << url.url().c_str();
-    i++;
-  }
+  m_device_tracker.UpdateFromSLP(urls);
 }
 
 void MainWindow::updateSLPServerInfo(bool da_enabled, uint16_t port,
@@ -125,12 +101,14 @@ void MainWindow::updateSLPServerInfo(bool da_enabled, uint16_t port,
 }
 
 void MainWindow::logTCPConnect(const IPV4Address &device) {
+  m_device_tracker.MarkAsConnected(device);
   QString output("Connected to: ");
   output.append(device.ToString().c_str());
   ui->TCPLog->appendPlainText(output);
 }
 
 void MainWindow::logTCPDisconnect(const IPV4Address &device) {
+  m_device_tracker.MarkAsDisconnected(device);
   QString output("Disconnected from: ");
   output.append(device.ToString().c_str());
   ui->TCPLog->appendPlainText(output);

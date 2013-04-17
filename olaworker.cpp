@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <string>
 #include <ola/StringUtils.h>
 #include <ola/e133/E133URLParser.h>
 #include "olaworker.h"
@@ -50,8 +51,9 @@ void OLAWorker::DiscoveryCallback(bool status, const URLEntries &urls) {
   }
 }
 
-void OLAWorker::newSLPServerInfo(bool ok,
-                                 const ola::e133::SLPThreadServerInfo &server_info) {
+void OLAWorker::newSLPServerInfo(
+    bool ok,
+    const ola::e133::SLPThreadServerInfo &server_info) {
   if (ok) {
     QString scopes(ola::StringJoin(", ", server_info.scopes).c_str());
     emit SLPServerProperties(server_info.da_enabled, server_info.port, scopes,

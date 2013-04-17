@@ -41,7 +41,8 @@ class OLAWorker : public QObject {
 
   signals:
     void newSLPDevices(const URLEntries &urls);
-    void SLPServerProperties(bool da_enabled, uint16_t port, const QString &scopes,
+    void SLPServerProperties(bool da_enabled, uint16_t port,
+                             const QString &scopes,
                              const QString &backend_type);
     void TCPConnect(const IPV4Address &device);
     void TCPDisconnect(const IPV4Address &device);
@@ -60,6 +61,5 @@ class OLAWorker : public QObject {
     ola::e133::MessageBuilder m_message_builder;
     ola::e133::DeviceManager m_device_manager;
     ola::e133::OLASLPThread m_slp_thread;
-
 };
-#endif // OLATHREAD_H
+#endif  // OLATHREAD_H
