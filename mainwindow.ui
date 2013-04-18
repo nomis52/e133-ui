@@ -169,7 +169,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="slpDiscoveryButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -193,7 +193,7 @@
       </widget>
       <widget class="QWidget" name="TCPLogTab">
        <property name="layoutDirection">
-        <enum>Qt::RightToLeft</enum>
+        <enum>Qt::LeftToRight</enum>
        </property>
        <attribute name="title">
         <string>TCP Monitor</string>
@@ -214,6 +214,7 @@
           <property name="font">
            <font>
             <family>Courier New</family>
+            <pointsize>14</pointsize>
            </font>
           </property>
           <property name="readOnly">
@@ -248,7 +249,10 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="RDMTab">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
        <attribute name="title">
         <string>RDM</string>
        </attribute>
@@ -286,7 +290,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QSpinBox" name="spinBox">
+           <widget class="QSpinBox" name="endpointSpinBox">
             <property name="maximum">
              <number>65535</number>
             </property>
@@ -300,30 +304,34 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="lineEdit"/>
+           <widget class="QLineEdit" name="uidInput">
+            <property name="text">
+             <string>7a70:ffffff00</string>
+            </property>
+           </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_11">
             <property name="text">
-             <string>PID</string>
+             <string>Parameter</string>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QComboBox" name="comboBox_2"/>
+           <widget class="QComboBox" name="pidComboBox"/>
           </item>
           <item row="5" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
-             <string>PID Data</string>
+             <string>Parameter Data</string>
             </property>
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="QLineEdit" name="lineEdit_2">
+           <widget class="QLineEdit" name="paramDataInput">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>5</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
@@ -337,7 +345,7 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QComboBox" name="comboBox_3">
+           <widget class="QComboBox" name="commandClassComboBox">
             <item>
              <property name="text">
               <string>GET</string>
@@ -353,7 +361,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="sendRDMButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -369,9 +377,33 @@
          </widget>
         </item>
         <item>
-         <widget class="QPlainTextEdit" name="plainTextEdit">
+         <widget class="QPlainTextEdit" name="UDPLog">
+          <property name="font">
+           <font>
+            <family>Courier New</family>
+            <pointsize>14</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Clear Log</string>
           </property>
          </widget>
         </item>

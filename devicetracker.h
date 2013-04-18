@@ -52,7 +52,7 @@ class DeviceTracker : public QObject {
     void MarkAsDisconnected(const IPV4Address &device);
 
     int NumberOfDevices() const { return m_devices.size(); }
-    const E133Device* DeviceAt(int i) const { return m_devices[i]; }
+    const E133Device* DeviceAt(int i) const;
 
   signals:
     void rowChanged(int first, int last);

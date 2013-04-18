@@ -9,6 +9,15 @@ E133DeviceListModel::E133DeviceListModel(const DeviceTracker *tracker,
                    this, SLOT(modelDataChanged()));
 }
 
+ola::network::IPV4Address E133DeviceListModel::IPAddressAt(int index) const {
+  const E133Device *device = m_tracker->DeviceAt(index);
+  if (device) {
+    return device->ip_address;
+  } else {
+    return IPV4Address();
+  }
+}
+
 int E133DeviceListModel::rowCount(const QModelIndex&) const {
   return m_tracker->NumberOfDevices();
 }

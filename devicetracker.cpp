@@ -86,6 +86,11 @@ void DeviceTracker::MarkAsDisconnected(const IPV4Address &device) {
   }
 }
 
+const E133Device* DeviceTracker::DeviceAt(int i) const {
+  if (i < 0 || i >= m_devices.size())
+    return NULL;
+  return m_devices[i];
+}
 
 int DeviceTracker::FindDeviceByIP(const IPV4Address &ip) {
   int start = 0;
