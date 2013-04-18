@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = E133App
 TEMPLATE = app
 
+CONFIG    += link_pkgconfig
+PKGCONFIG += "libola libolae133slp libolae133controller libolae133common libolaacn" 
 
 SOURCES += main.cpp\
         mainwindow.cpp \
