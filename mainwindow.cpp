@@ -1,4 +1,5 @@
 #include <ola/StringUtils.h>
+#include <ola/e133/E133StatusHelper.h>
 #include <ola/e133/SLPThread.h>
 #include <ola/network/IPV4Address.h>
 #include <ola/rdm/RDMCommand.h>
@@ -147,19 +148,24 @@ void MainWindow::logTCPMessage(const IPV4Address &device, uint16_t endpoint,
 }
 
 void MainWindow::logUDPStatusMessage(const E133StatusMessage &status_message) {
+  ola::e133::E133StatusCode status_code;
+
   m_command_str.str("");
-  m_command_str << status_message.device << ", Endpoint "
+  m_command_str << status_message.ip << ", Endpoint "
                 << status_message.endpoint << ", #"
                 << status_message.sequence_number << endl;
-  m_command_str << "  Status " << status_message.status_code << ": "
-                << status_message.status_message;
+  m_command_str << "  SC 0x" << std::hex << std::setw(4)
+                << status_message.status_code << ": ";
+  if (IntToStatusCode(status_message.status_code, &status_code))
+    m_command_str << ola::e133::StatusMessageIdToString(status_code) << " : ";
+  m_command_str << "\"" << status_message.status_message << "\"" << endl;
 
   ui->UDPLog->appendPlainText(QString(m_command_str.str().c_str()));
 }
 
 void MainWindow::logUDPRDMMessage(const E133RDMMessage &rdm_message) {
   m_command_str.str("");
-  m_command_str << rdm_message.device << ", Endpoint "
+  m_command_str << rdm_message.ip<< ", Endpoint "
                 << rdm_message.endpoint << ", #"
                 << rdm_message.sequence_number << endl;
   rdm_message.response->Print(&m_command_printer, false, true);
