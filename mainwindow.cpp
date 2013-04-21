@@ -288,3 +288,8 @@ RDMRequest* MainWindow::BuildRequest(const UID &dest_uid,
         pid, param_data, param_data_length);
   }
 }
+
+void MainWindow::on_ipComboBox_currentIndexChanged(int index) {
+  UID uid = m_model_list.UIDAt(ui->ipComboBox->currentIndex());
+  ui->uidInput->setText(QString(uid.ToString().c_str()));
+}

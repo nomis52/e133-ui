@@ -64,7 +64,9 @@ class MainWindow : public QMainWindow {
         const uint8_t *param_data,
         unsigned int param_data_length);
 
-  private:
+    void on_ipComboBox_currentIndexChanged(int index);
+
+private:
     const UID m_uid;
     OLAWorker *m_worker;
     ola::SequenceNumber<uint8_t> m_transaction_number;

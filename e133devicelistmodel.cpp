@@ -18,6 +18,15 @@ ola::network::IPV4Address E133DeviceListModel::IPAddressAt(int index) const {
   }
 }
 
+ola::rdm::UID E133DeviceListModel::UIDAt(int index) const {
+  const E133Device *device = m_tracker->DeviceAt(index);
+  if (device) {
+    return device->uid;
+  } else {
+    return UID::AllDevices();
+  }
+}
+
 int E133DeviceListModel::rowCount(const QModelIndex&) const {
   return m_tracker->NumberOfDevices();
 }
