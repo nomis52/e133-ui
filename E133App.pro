@@ -12,7 +12,7 @@ TARGET = E133App
 TEMPLATE = app
 
 CONFIG    += link_pkgconfig
-PKGCONFIG += "libola libolae133slp libolae133controller libolae133common libolaacn" 
+PKGCONFIG += "libola libolae133slp libolaslpclient libolae133controller libolae133common libolaacn" 
 
 SOURCES += main.cpp\
         mainwindow.cpp \

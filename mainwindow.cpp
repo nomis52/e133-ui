@@ -222,7 +222,7 @@ void MainWindow::on_sendRDMButton_clicked() {
     return;
   }
 
-  vector<string> inputs;
+  std::vector<string> inputs;
   string param_data_str(ui->paramDataInput->text().toLocal8Bit().data());
   if (!param_data_str.empty())  {
     ola::StringSplit(param_data_str, inputs);

@@ -5,7 +5,7 @@
 PIDListModel::PIDListModel(const ola::rdm::PidStoreHelper *pid_helper,
                            QObject *parent)
     : QAbstractListModel(parent) {
-  vector<const ola::rdm::PidDescriptor*> descriptors;
+  std::vector<const ola::rdm::PidDescriptor*> descriptors;
   pid_helper->SupportedPids(0, &descriptors);
   for (const auto* descriptor : descriptors) {
     QString label = QString("%1 (0x%2)")
